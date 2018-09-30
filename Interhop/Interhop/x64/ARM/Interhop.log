@@ -1,0 +1,55 @@
+﻿  stdafx.cpp
+  Interhop.cpp
+  OpenCLUtil.cpp
+d:\drive\gpupractice\interhop\interhop\cl.hpp(146): warning C4068: unknown pragma
+d:\drive\gpupractice\interhop\interhop\cl.hpp(147): warning C4068: unknown pragma
+d:\drive\gpupractice\interhop\interhop\cl.hpp(12911): warning C4068: unknown pragma
+d:\drive\gpupractice\interhop\interhop\openclutil.cpp(27): warning C4244: '=': conversion from '__int64' to 'int', possible loss of data
+  OpenCLWrapper.cpp
+d:\drive\gpupractice\interhop\interhop\cl.hpp(146): warning C4068: unknown pragma
+d:\drive\gpupractice\interhop\interhop\cl.hpp(147): warning C4068: unknown pragma
+d:\drive\gpupractice\interhop\interhop\cl.hpp(12911): warning C4068: unknown pragma
+  OpenGLUtil.cpp
+  OpenGLWrapper.cpp
+d:\drive\gpupractice\interhop\interhop\cl.hpp(146): warning C4068: unknown pragma
+d:\drive\gpupractice\interhop\interhop\cl.hpp(147): warning C4068: unknown pragma
+d:\drive\gpupractice\interhop\interhop\cl.hpp(12911): warning C4068: unknown pragma
+  shader.cpp
+  Generating Code...
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewBindBuffer imported
+OpenGLWrapper.obj : warning LNK4049: locally defined symbol __glewBindBuffer imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewBufferData imported
+OpenGLWrapper.obj : warning LNK4049: locally defined symbol __glewBufferData imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewGenBuffers imported
+OpenGLWrapper.obj : warning LNK4049: locally defined symbol __glewGenBuffers imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewAttachShader imported
+shader.obj : warning LNK4049: locally defined symbol __glewAttachShader imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewCompileShader imported
+shader.obj : warning LNK4049: locally defined symbol __glewCompileShader imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewCreateProgram imported
+shader.obj : warning LNK4049: locally defined symbol __glewCreateProgram imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewCreateShader imported
+shader.obj : warning LNK4049: locally defined symbol __glewCreateShader imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewGetProgramInfoLog imported
+shader.obj : warning LNK4049: locally defined symbol __glewGetProgramInfoLog imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewGetProgramiv imported
+shader.obj : warning LNK4049: locally defined symbol __glewGetProgramiv imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewGetShaderInfoLog imported
+shader.obj : warning LNK4049: locally defined symbol __glewGetShaderInfoLog imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewGetShaderiv imported
+shader.obj : warning LNK4049: locally defined symbol __glewGetShaderiv imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewLinkProgram imported
+shader.obj : warning LNK4049: locally defined symbol __glewLinkProgram imported
+OpenGLUtil.obj : warning LNK4049: locally defined symbol __glewShaderSource imported
+shader.obj : warning LNK4049: locally defined symbol __glewShaderSource imported
+OpenGLWrapper.obj : warning LNK4049: locally defined symbol __glewEnableVertexAttribArray imported
+OpenGLWrapper.obj : warning LNK4049: locally defined symbol __glewGetUniformLocation imported
+OpenGLWrapper.obj : warning LNK4049: locally defined symbol __glewUseProgram imported
+OpenGLWrapper.obj : warning LNK4049: locally defined symbol __glewVertexAttribPointer imported
+OpenGLWrapper.obj : warning LNK4049: locally defined symbol __glewBindVertexArray imported
+OpenGLWrapper.obj : warning LNK4049: locally defined symbol __glewGenVertexArrays imported
+shader.obj : warning LNK4049: locally defined symbol __glewDeleteShader imported
+glew32s.lib(glew.obj) : warning LNK4099: PDB 'vc120.pdb' was not found with 'glew32s.lib(glew.obj)' or at 'D:\Drive\GPUPractice\Interhop\x64\ARM\vc120.pdb'; linking object as if no debug info
+  Interhop.vcxproj -> D:\Drive\GPUPractice\Interhop\x64\ARM\Interhop.exe

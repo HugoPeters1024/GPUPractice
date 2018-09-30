@@ -1,0 +1,47 @@
+inline uint hash(uint x) {
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = (x >> 16) ^ x;
+    return x;
+}
+
+inline float random(uint seed) {
+	return hash(seed) / (float)(UINT_MAX);
+}
+
+kernel void pathtracer(image2d_t write_only A) {
+	uint x = get_global_id(0);
+	uint y = get_global_id(1);
+	write_imagef(A, (int2)(x,y), (float4)(random(x + 512 * y)));
+
+	float4 sphere = (float4)(0, 0, 1, 0.5f);
+
+	float u = x / (float)512;
+	float v = y / (float)512;
+
+	float3 pixel = (float3)(u-0.5f, v-0.5f, 0.3f);
+
+	float3 ray_dir = normalize(pixel);
+	float3 ray_or = (float3)(0);
+	float ray_t = FLT_MAX;
+	float3 ray_normal;
+	float4 ray_color = (float4)(0);
+
+	float3 c = sphere.xyz - ray_or;
+	float t = dot(c, ray_dir);
+	float3 q = c - ray_dir * t;
+	float p2 = dot(q, q);
+	if (p2 < sphere.w * sphere.w) {
+		t -= sqrt(sphere.w * sphere.w - p2);
+		if (t < ray_t && t > 0) {
+			ray_t = t;
+			float3 endpos = ray_or + ray_dir * t;
+			ray_normal = normalize(endpos - sphere.xyz);
+			ray_color = (float4)dot((float3)(0,1,0), ray_normal);
+		}
+	}
+
+	write_imagef(A, (int2)(x,y), ray_color);
+
+
+}

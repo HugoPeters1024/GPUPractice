@@ -1,0 +1,31 @@
+void kernel fire(image2d_t read_only A, image2d_t write_only B, image2d_t read_only C, image2d_t write_only D, int SCR_WIDTH, int SCR_HEIGTH, float time) {
+	int x = get_global_id(0);
+	int y = get_global_id(1);
+
+	//Spread section (average of direct neighbours)
+	float4 sum = (float4)(0);
+	for(int j=-1; j<2; j++) {
+		for(int i=-1; i<2; i++) {
+			if (j == 0 || i == 0)
+				continue;
+			sum += read_imagef(A, sampler, (int2)(x+i, y+j));
+		}
+	}
+
+	float4 r = read_imagef(C, sampler2,(int2)(x,y));
+	float wave = (0.8f*sin((x*5) / (float)SCR_WIDTH - time*20) + 0.2f*cos((x*20) / (float)SCR_WIDTH + time*10)) * (0.1*(1-sin(time*10))+0.9f);
+	wave = pow(wave, 6);
+	//printf("%f, ", wave);
+	sum = max(0,sum-r*(wave*0.3f+0.68f));
+	//sum = max(0,,sum-r*5f);
+
+	
+	if (y < 1.0f + 7.0f * max(sin((float)x / 15.0f + time * 2.0f), 0.0f))
+		sum = (float4)(4, 4*0.82f,4*0.72f,4);
+
+
+	write_imagef(B, (int2)((x)%SCR_WIDTH,(y+3)%SCR_HEIGTH), sum / 3.92f);
+		
+	write_imagef(D, (int2)((x)%SCR_WIDTH,(y+3)%SCR_HEIGTH), r);
+	//write_imagef(B, (int2)(x,y+1)%SCR_HEIGTH, r);
+}

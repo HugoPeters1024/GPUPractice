@@ -1,0 +1,79 @@
+#define BUFFER_WIDTH 256
+
+uint hash(uint x) {
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = (x >> 16) ^ x;
+    return x;
+}
+
+void kernel ClearImage(image2d_t write_only A) {
+	int x = get_global_id(0);
+	int y = get_global_id(1);
+	write_imagef(A, (int2)(x,y), (float4)(0));
+}
+
+void kernel CopyImage(image2d_t read_only A, image2d_t write_only B) {
+}
+
+void kernel FadeImage(image2d_t write_only A, float f) {
+	int x = get_global_id(0);
+	int y = get_global_id(1);
+
+}
+
+void kernel GenerateParticles(global float3* p, global float3* v, int WIDTH, int HEIGTH) {
+	int id = get_global_id(0);
+	for(int j=0; j<BUFFER_WIDTH; j++) {
+		int i = id * BUFFER_WIDTH + j;
+		//printf("%i, ", i);
+		float rx = hash(i) / (float)UINT_MAX;
+		float ry = hash(i+10000) / (float)UINT_MAX;
+		float rz = hash(i-25000) / (float)UINT_MAX;
+		float rvx = hash(i+30000) / (float)UINT_MAX;
+		float rvy = hash(i+40000) / (float)UINT_MAX;
+		float rvz = hash(i+58000) / (float)UINT_MAX;
+		p[i] = (float3)(rx * WIDTH, ry * HEIGTH, 1.0f + 5.0f * rz);
+		v[i] = (float3)(0);
+		v[i].x = rvx * 0.1f - 0.05f;
+		v[i].y = rvy * 0.1f - 0.05f;
+		v[i].z = -rvx / 340.0f;
+	}
+} 
+
+void kernel ParticleSystem(image2d_t write_only A, global float3* p, global float3* v, int WIDTH, int HEIGTH) {
+	int id = get_global_id(0);
+	for(int j=0; j<BUFFER_WIDTH; j++) {
+		int i = id * BUFFER_WIDTH + j;
+
+		float a = (j - BUFFER_WIDTH/2) / 20000.0f;
+		p[i].x -= WIDTH / 2.0f;
+		p[i].y -= HEIGTH / 2.0f;
+		p[i].x = p[i].x * cos(a) - p[i].y * sin(a);
+		p[i].y = p[i].x * sin(a) + p[i].y * cos(a);
+		p[i].x += WIDTH / 2.0f;
+		p[i].y += HEIGTH / 2.0f;
+	
+
+		p[i] += v[i];
+		p[i].x = fmod(p[i].x + WIDTH, WIDTH);
+		p[i].y = fmod(p[i].y + HEIGTH, HEIGTH);
+		p[i].z = fmod(p[i].z + 5.0f, 5.0f);
+
+		float xf = p[i].x - WIDTH/2.0f;
+		float yf = p[i].y - HEIGTH/2.0f;
+		xf /= p[i].z;
+		yf /= p[i].z;
+
+		xf += WIDTH / 2.0f;
+		yf += HEIGTH / 2.0f;
+
+		int x = min(max((int)xf, 0), WIDTH-1);
+		int y = min(max((int)yf, 0), HEIGTH-1);
+
+
+		float fj = j / (float)BUFFER_WIDTH * 2 * 3.1415f;
+		float4 col = (float4)(3.5f - p[i].z) * 0.35f * (float4)(sin(fj), cos(fj), tan(fj),0);
+		write_imagef(A, (int2)(x,y), col);
+	}
+}

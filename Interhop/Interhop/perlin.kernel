@@ -1,0 +1,20 @@
+// 2D Noise based on Morgan McGuire @morgan3d
+// https://www.shadertoy.com/view/4dS3Wd
+kernel void perlin(image2d_t write_only A) {
+	int x = get_global_id(0);
+	int y = get_global_id(1);
+
+	float fx = (float)x / 512.f;
+	float fy = (float)y / 512.f;
+
+	float i = sin(fx*60) * sin(fx * 40) + sin(fy *100);
+	float j = sin(fy*45) * sin(fy * 13) + 0.5f*cos(fy *500);
+	float m = i * j;
+	if (m < 0)
+		m = -m;
+
+	//m = sin(fx*50) * cos(fy*50);
+	m = hash(x + 512 * y) / (float)UINT_MAX;
+
+	write_imagef(A, (int2)(x,y), (float4)(min(1.0f, pow(m,5))));
+}

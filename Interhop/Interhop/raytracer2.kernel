@@ -1,0 +1,87 @@
+typedef struct {
+	float3 origin;
+	float3 direction;
+	float t;
+	float4 color;
+	float3 normal;
+} Ray;
+
+inline void Intersect(Ray* ray, float4 sphere) {
+	float3 c = sphere.xyz - ray->origin;
+	float t = dot(c, ray->direction);
+	float3 q = c - ray->direction * t;
+	float p2 = dot(q, q);
+	if (p2 < sphere.w * sphere.w) {
+		t -= sqrt(sphere.w * sphere.w - p2);
+		if (t < ray->t && t > 0) {
+			ray->t = t;
+			ray->color = (float4)(0.8,0.5,1,0);
+			float3 endpos = ray->origin + ray->direction * t;
+			ray->normal = normalize(endpos - sphere.xyz);
+		}
+	}
+}
+
+kernel void raytracer(image2d_t write_only A, 
+					  float2 screen_size, 
+					  global float4* spheres, 
+					  int sphere_count,
+					  global float3* lights,
+					  int light_count) 
+{
+	int x = get_global_id(0);
+	int y = get_global_id(1);
+	Ray ray;
+
+	//Starting rays from camera
+	ray.origin =  (float3)(0);
+	ray.t = FLT_MAX;
+	ray.color = (float4)(0);
+
+	//calculate screen pixel
+	float u = -1.0f + (x / screen_size.x) * 2;
+	float v = -1.0f + (y / screen_size.y) * 2;
+	
+	float3 screen_pos = (float3)(u, v, 0.5f);
+	ray.direction = normalize(screen_pos - ray.origin);
+	
+
+	for(int i=0; i<sphere_count; i++) {
+		Intersect(&ray, spheres[i]);
+	}
+
+	if (ray.t < FLT_MAX) {
+		for(int i=0; i<light_count; i++) {
+			Ray shadowRay;
+			shadowRay.t = FLT_MAX;
+			shadowRay.origin = ray.origin + ray.direction * ray.t;
+			reflect(ray.direction, ray.normal);
+
+			/*
+			for(int j=0; j<sphere_count; j++)
+				Intersect(&shadowRay, spheres[j]);
+
+			if (shadowRay.t < FLT_MAX)
+				ray.color = (float4)(0); */
+		}
+	}
+
+	write_imagef(A, (int2)(x,y), ray.color * dot(ray.normal, (float3)(0,1,0)));
+	//write_imagef(A, (int2)(x,y), (float4)(ray.t));
+
+	
+	/*
+	  def Intersect(self, ray):
+    c = self.pos - ray.O
+    t = c.Dot(ray.D)
+    q = c - ray.D * t
+    p2 = q.Dot(q)
+    if p2 > self.rad * self.rad:
+      return
+    t -= math.sqrt(self.rad * self.rad - p2)
+    if ((t < ray.T) and t > 0):
+      ray.T = t
+      ray.I = self
+      start = ray.O + ray.D * ray.T
+      ray.Normal = (start - self.pos).Normalize() */
+}

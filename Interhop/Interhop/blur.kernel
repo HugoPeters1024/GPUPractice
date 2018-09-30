@@ -1,0 +1,19 @@
+__constant sampler_t sampler =
+    CLK_NORMALIZED_COORDS_FALSE
+   | CLK_ADDRESS_CLAMP_TO_EDGE		//Might be handy later
+    | CLK_FILTER_NEAREST;
+
+__constant sampler_t sampler2 =
+	CLK_NORMALIZED_COORDS_TRUE
+	| CLK_ADDRESS_REPEAT
+	| CLK_FILTER_NEAREST;
+
+void kernel blur(image2d_t read_only A, image2d_t write_only B) {
+	int x = get_global_id(0);
+	int y = get_global_id(1);
+	float4 sum = (float4)(0); 
+	for(int j=0; j<3; j++)
+		for(int i=0; i<3; i++)
+			sum += read_imagef(A, sampler, (int2)(x-1+i,y-1+j));
+	write_imagef(B, (int2)(x,y), sum / 9.0f);
+};

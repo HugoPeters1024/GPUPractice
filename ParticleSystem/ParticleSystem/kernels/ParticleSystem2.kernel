@@ -1,0 +1,69 @@
+#define BUFFER_WIDTH 8
+
+uint hash(uint x) {
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = ((x >> 16) ^ x) * 0x45d9f3b;
+    x = (x >> 16) ^ x;
+    return x;
+}
+
+void kernel ClearImage(image2d_t write_only A) {
+	int x = get_global_id(0);
+	int y = get_global_id(1);
+	write_imagef(A, (int2)(x,y), (float4)(0));
+}
+
+void kernel GenerateParticles(global float3* p, global float3* v, int WIDTH, int HEIGTH) {
+	for(int j=0; j<BUFFER_WIDTH; j++) {
+		int i = get_global_id(0) * BUFFER_WIDTH + j;
+		//printf("%i, ", i);
+		float rx = hash(i) / (float)UINT_MAX;
+		float ry = hash(i+10000) / (float)UINT_MAX;
+		float rz = hash(i-25000) / (float)UINT_MAX;
+		float rvx = hash(i+30000) / (float)UINT_MAX;
+		float rvy = hash(i+40000) / (float)UINT_MAX;
+		float rvz = hash(i+58000) / (float)UINT_MAX;
+		p[i] = (float3)(rx * WIDTH, ry * HEIGTH, 1.0f + 5.0f * rz);
+		v[i] = (float3)(0);
+		v[i].x = rvx * 4.0f - 2.0f;
+		v[i].y = rvy * 4.0f - 2.0f;
+		v[i].z = -rvz / 30.0f - 0.5f;
+	}
+} 
+
+void kernel ParticleSystem(image2d_t write_only A, global float3* p, global float3* v, int WIDTH, int HEIGTH) {
+	for(int j=0; j<BUFFER_WIDTH; j++) {
+		int i = get_global_id(0) * BUFFER_WIDTH + j;
+		//printf("%i, ", i);
+
+
+		if (p[i].z < 1.0f || p[i].x < 0.0f || p[i].y < 0.0f || p[i].x > WIDTH || p[i].y > HEIGTH) {
+			p[i].z = 1.0f + (hash(i-15000) / (float)UINT_MAX) * 5.0f;
+			p[i].x = (hash(i-60000) / (float)UINT_MAX) * (WIDTH-1);
+			p[i].y = (hash(i-50000) / (float)UINT_MAX) * (HEIGTH-1) + 1.0f;
+			v[i].x = (hash(i-90000) / (float)UINT_MAX) * 8.0f - 4.0f;
+			v[i].y = (hash(i-70000) / (float)UINT_MAX) * 8.0f - 4.0f;
+			v[i].z = ((hash(i-23000) / (float)UINT_MAX)) * -0.1f - 0.5f;
+		}
+
+		int x = (int)p[i].x;
+		int y = (int)p[i].y;
+		x -= WIDTH / 2;
+		y -= HEIGTH / 2;
+		x /= p[i].z;
+		y /= p[i].z;
+		x += WIDTH / 2;
+		y += HEIGTH / 2;
+		x = min(max((int)p[i].x, 0), WIDTH-2);
+		y = min(max((int)p[i].y, 0), HEIGTH-2);
+
+		float4 col = (float4)(2) / (p[i].z + 0.0001f);
+		float xf = p[i].x - floor(p[i].x);
+		float yf = p[i].y - floor(p[i].y);
+
+		write_imagef(A, (int2)(x,y), col);
+		write_imagef(A, (int2)(x+1, y), col * xf);
+		write_imagef(A, (int2)(x, y+1), col * yf);
+		write_imagef(A, (int2)(x+1, y+1), col * (yf/2.0f) + col * (xf/2.0f));
+	}
+}

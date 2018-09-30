@@ -1,0 +1,11 @@
+void kernel generate_image(image2d_t read_write A, image2d_t read_write B) {
+	int x = get_global_id(0);
+	int y = get_global_id(1);
+	float4 col = (float4)(0);
+	if (x % 32 > 16)
+		col += (float4)(0.5);
+	if (y % 32 > 16)
+		col += (float4)(0.5);
+
+	write_imagef(A, (int2)(x,y), col);
+}

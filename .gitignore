@@ -1,0 +1,7 @@
+*.obj
+*.idb
+*.db
+.tlog
+.vs/
+/.vs
+*/x64
